@@ -382,8 +382,8 @@ class FacturaDetAdmin(admin.ModelAdmin):
 
 @admin.register(Rutas)
 class RutasAdmin(admin.ModelAdmin):
-    list_display = ('id', 'ruta',)
-    search_fields = ('id', 'ruta',)
+    list_display = ('id', 'ruta','descripcion')
+    search_fields = ('id', 'ruta','descripcion')
 
 @admin.register(Transporte)
 class TransporteAdmin(admin.ModelAdmin):
@@ -400,11 +400,85 @@ class DevolucionesAdmin(admin.ModelAdmin):
     list_display = ('id', 'id_producto', 'cantidad', 'descripcion', 'fecha_devolucion')
     search_fields = ('id', 'id_producto', 'cantidad', 'descripcion', 'fecha_devolucion')
 
+###
+class DetalleCotizacionInline(admin.TabularInline):
+    model = DetalleCotizacion
+    extra = 1
+    autocomplete_fields = ['producto']
+
+def get_context_data_cotizacion(cotizacion):
+    detalles_cotizacion = DetalleCotizacion.objects.filter(cotizacion=cotizacion)
+    
+    datos_cotizacion = {
+        'encabezado': {
+            'Sucursal': cotizacion.usuario.empleado.sucursal.nombre if cotizacion.usuario.empleado.sucursal else 'N/A',
+            'Dirección': cotizacion.usuario.empleado.sucursal.direccion if cotizacion.usuario.empleado.sucursal else 'N/A',
+            'numero_cotizacion': cotizacion.id,
+            'fecha_cotizacion': cotizacion.fecha_cotizacion,
+            'usuario': cotizacion.usuario.username,
+            'cai': cotizacion.parametros.cai,
+            'rtn': cotizacion.id_cliente.rtn,
+            'documento': cotizacion.id_cliente.documento,
+        },
+        'cotizacion': cotizacion.productos.all(),
+        'detalles_cotizacion': detalles_cotizacion,
+    }
+
+    return datos_cotizacion
+
 @admin.register(Cotizacion)
 class CotizacionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'id_cliente', 'id_producto', 'fecha_cotizacion')
-    search_fields = ('id', 'id_cliente', 'id_producto', 'fecha_cotizacion')
+    inlines = [DetalleCotizacionInline]
+    list_display = ('id', 'id_cliente', 'sub_total', 'descuento', 'impuesto', 'total', 'fecha_cotizacion', 'usuario','boton_pdf')
+    list_filter = ('fecha_cotizacion', 'usuario')
+    search_fields = ['id_cliente__nombre', 'usuario__username']
+    readonly_fields = ('sub_total', 'descuento', 'impuesto', 'total', 'fecha_cotizacion', 'usuario')
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'id_cliente':
+            # Establecer el valor por defecto a "Consumidor Final"
+            kwargs['initial'] = Clientes.objects.get(nombre='Consumidor Final')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def usuario_username(self, obj):
+        return obj.usuario.username if obj.usuario else '-'
+    
+    usuario_username.short_description = 'Nombre de Usuario'
+
+    def save_model(self, request, obj, form, change):
+        if not obj.usuario:
+            obj.usuario = get_user(request)
+        super().save_model(request, obj, form, change)
+    
+    def boton_pdf(self, obj):
+        pdf_url = reverse('descargar_pdf_Cotizacion', args=[obj.id])
+        print(pdf_url)
+        return format_html('<a href="{}" class="btn btn-success">Imprimir</button>', pdf_url)
+    
+    boton_pdf.short_description = 'PDF Factura'
+    
+    def generar_pdf_Cotizacion(self, request, queryset):
+        for cotizacion_ in queryset:
+            # Generar el PDF y enviarlo como respuesta al navegador
+            template = get_template('Cotizacion.html')  # Asegúrate de tener este archivo de plantilla
+            context = get_context_data_cotizacion(cotizacion_)
+            html_content = template.render(context)
+
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="cotizacion_{cotizacion_.id}.pdf"'
+            pisa_status = pisa.CreatePDF(html_content, dest=response)
+
+            if pisa_status.err:
+                return HttpResponse(f'Error al generar el PDF para la cotizazcion {cotizacion_.id}')
+
+        return response
+
+@admin.register(DetalleCotizacion)
+class DetalleCotizacionAdmin(admin.ModelAdmin):
+    list_display = ('cotizacion', 'producto', 'cantidad')
+    search_fields = ['cotizacion__id', 'producto__nombre']
+
+###
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
     list_display = ('id', 'id_clientes', 'id_producto', 'fecha_pedido', 'total_pedido')

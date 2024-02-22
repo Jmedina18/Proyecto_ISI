@@ -23,4 +23,5 @@ from DistribuidoraCarne.views import  *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('descargar_pdf_factura/<int:id>/', views.descargar_pdf_factura, name='descargar_pdf_factura'),
+    path('descargar_pdf_cotizacion/<int:id>/', views.descargar_pdf_cotizacion, name='descargar_pdf_Cotizacion'),
 ]

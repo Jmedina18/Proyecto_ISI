@@ -92,3 +92,72 @@ def descargar_pdf_factura(request, id):
         form = CategoriaForm()
 
     return render(request, 'tu_template.html', {'form': form})
+
+def descargar_pdf_cotizacion(request, id):
+
+    cotizacion_obj = get_object_or_404(Cotizacion, id=id)
+
+    detalle_cotizacion_precio_etc = Cotizacion.objects.get(pk=id)
+    detalles_cotizacion = DetalleCotizacion.objects.filter(cotizacion=cotizacion_obj)
+
+    def calcular_importes_por_producto(detalles_cotizacion):
+        importes_por_producto = []
+        for detalle in detalles_cotizacion:
+            importe_por_producto = round(detalle.producto.producto.precio_venta * detalle.cantidad, 2)
+            importes_por_producto.append(importe_por_producto)
+        return importes_por_producto
+
+    # Calcular el importe total
+    importes_por_producto = calcular_importes_por_producto(detalles_cotizacion)
+    importe_total = sum(importes_por_producto)
+
+    current_user = get_user(request)
+
+    #Empleadosucursal
+    empleado_sucursal = cotizacion_obj.usuario.empleado.sucursal
+    empleado_nombre = cotizacion_obj.usuario.empleado
+    sucursal_id = cotizacion_obj.usuario.empleado.sucursal.id
+    sucursal_id_format = str(sucursal_id).zfill(3)
+    
+    # Obtener el nombre del cliente concatenando nombre_cliente y apellido_cliente
+    nombre_cliente = f"{cotizacion_obj.id_cliente.nombre} {cotizacion_obj.id_cliente.apellido}"
+    cliente_doc = f"{cotizacion_obj.id_cliente.documento}"
+    
+    detalle_cotizacion_precio_etc = [detalle_cotizacion_precio_etc]
+
+    context = {
+        'encabezado': {
+            'importe_total': round(importe_total, 2),
+            'importes_por_producto': [round(importe, 2) for importe in importes_por_producto],
+            'numero_cotizacion': cotizacion_obj.id,
+            'cliente': nombre_cliente,
+            'cliente_doc': cliente_doc,
+            'cai': cotizacion_obj.parametros.cai,
+            'fecha_cotizacion': cotizacion_obj.fecha_cotizacion,
+            'empleado': empleado_nombre,
+            'sucursal': sucursal_id_format,
+            'sucursal_name': empleado_sucursal.nombre if empleado_sucursal else 'N/A',
+            'direccion_sucursal': empleado_sucursal.direccion if empleado_sucursal else 'N/A',
+            'rtn': empleado_sucursal.rtn if empleado_sucursal else 'N/A',
+            'subtotal': cotizacion_obj.sub_total,
+            'descuento': cotizacion_obj.descuento,
+            'impuesto': cotizacion_obj.impuesto,
+            'total': cotizacion_obj.total,
+            'enumerate': enumerate,  # Agrega la función enumerate al contexto
+        },
+        'detalles_cotizacion': detalles_cotizacion,
+        'detalle_cotizacion_precio_etc': detalle_cotizacion_precio_etc,
+    }
+
+    # Renderizar la plantilla con el contexto
+    html_content = render_to_string('Cotizacion.html', context)
+
+    # Crear el PDF y devolver la respuesta
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="cotizacion_{id}.pdf"'
+    pisa_status = pisa.CreatePDF(html_content, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse('Error al generar el PDF', status=500)
+
+    return response

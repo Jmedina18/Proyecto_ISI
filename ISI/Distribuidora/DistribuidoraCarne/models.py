@@ -28,10 +28,10 @@ def get_current_user(request):
 
 #UltimoCambio
 class MetodosPago(models.Model):
-    nombre = models.CharField(max_length=50, validators=[validar_nombre],null=False,verbose_name='Nombre metodo de pago')
-    descripcion = models.CharField(max_length=40, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
+    nombre = models.CharField(max_length=15, validators=[validar_nombre_titular],null=False,verbose_name='Nombre método de pago')
+    descripcion = models.TextField(max_length=50, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     status = models.CharField(max_length=2, choices=(('1', 'Activo'), ('2', 'Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -57,9 +57,9 @@ class MetodosPago(models.Model):
         #ordering = ['nombre']  # Puedes especificar el orden predeterminado de los objetos en las consultas
 
 class TipoDocumento(models.Model):
-    nombre = models.CharField(max_length=10, validators=[validar_nombre], default='Identidad',verbose_name='Nombre del documento')
+    nombre = models.CharField(max_length=15, validators=[validar_nombre_titular], default='Identidad',verbose_name='Nombre del documento')
     status = models.CharField(max_length=2, choices=(('1', 'Activo'), ('2', 'Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -85,10 +85,10 @@ class TipoDocumento(models.Model):
         #ordering = ['nombre']
 
 class TipoCargo(models.Model):
-    nombre = models.CharField(max_length=50, validators=[validar_nombre],null=False,verbose_name='Nombre del Cargo')
-    descripcion = models.CharField(max_length=40, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
+    nombre = models.CharField(max_length=15, validators=[validar_nombre_titular],null=False,verbose_name='Nombre del Cargo')
+    descripcion = models.TextField(max_length=50, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     status = models.CharField(max_length=2, choices=(('1', 'Activo'), ('2', 'Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -116,13 +116,13 @@ class TipoCargo(models.Model):
 class Clientes(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, on_delete=models.CASCADE, default=1)
     documento = models.CharField(max_length=21, validators=[validar_id],null=False,editable=True,verbose_name='Documento')
-    nombre = models.CharField(max_length=65,validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre')
-    apellido = models.CharField(max_length=65,validators=[validar_nombre],null=False,editable=True,verbose_name='Apellido')
-    telefono = models.CharField(max_length=10, validators=[validar_telefono],null=False,editable=True,verbose_name='Telefono')
+    nombre = models.CharField(max_length=20,validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Nombre')
+    apellido = models.CharField(max_length=20,validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Apellido')
+    telefono = models.CharField(max_length=8, validators=[validar_telefono],null=False,editable=True,verbose_name='Teléfono')
     correo = models.CharField(max_length=50, validators=[validar_correo],null=False,editable=True,verbose_name='Correo')
-    direccion = models.CharField(max_length=150, validators=[validar_direccion],null=False,editable=True,verbose_name='Dirrecion')
+    direccion = models.CharField(max_length=150, validators=[validar_direccion],null=False,editable=True,verbose_name='Dirección')
     rtn = models.CharField(max_length=14, validators=[validar_rtn],null=True,blank=True,editable=True,verbose_name='RTN')
-    fecha_creacion = models.DateTimeField(auto_now_add=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now_add=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -149,10 +149,10 @@ class Clientes(models.Model):
         return str(f"{self.nombre}{' ' + self.apellido if self.apellido else ''} {self.nombre}")
 
 class Categoria(models.Model):
-    nombre = models.CharField(max_length=65, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre Categoria')
-    descripcion = models.CharField(max_length=400, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
+    nombre = models.CharField(max_length=20, validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Nombre Categoría')
+    descripcion = models.TextField(max_length=50, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     status = models.CharField(max_length=2, choices=(('1', 'Activo'), ('2', 'Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -168,8 +168,8 @@ class Categoria(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'Categoria'
-        verbose_name_plural = 'Categorias'
+        verbose_name = 'Categoría'
+        verbose_name_plural = 'Categorías'
         #ordering = ['nombre']
         
     def __str__(self):
@@ -179,14 +179,14 @@ class Categoria(models.Model):
         return str(f"{self.nombre}{' ' + self.descripcion if self.descripcion else ''} {self.nombre}")
 
 class Proveedor(models.Model):
-    nombre = models.CharField(max_length=65, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre Proveedor')
-    telefono = models.CharField(max_length=10, validators=[validar_telefono],null=False,editable=True,verbose_name='Telefono de Empresa')
+    nombre = models.CharField(max_length=12, validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Nombre Proveedor')
+    telefono = models.CharField(max_length=8, validators=[validar_telefono],null=False,editable=True,verbose_name='Teléfono de Empresa')
     correo = models.CharField(max_length=50, validators=[validar_correo],null=False,editable=True,verbose_name='Correo')
-    direccion = models.CharField(max_length=255, validators=[validar_direccion],null=False,editable=True,verbose_name='Direccion')
+    direccion = models.CharField(max_length=255, validators=[validar_direccion],null=False,editable=True,verbose_name='Dirección')
     rtn = models.CharField(max_length=14, validators=[validar_rtn],null=False,editable=True,verbose_name='RTN')
-    nombre_contacto = models.CharField(max_length=50, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre de Contacto')
-    telefono_contacto = models.CharField(max_length=50, validators=[validar_telefono],null=False,editable=True,verbose_name='Numero de Contacto')
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    nombre_contacto = models.CharField(max_length=20, validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Nombre de Contacto')
+    telefono_contacto = models.CharField(max_length=8, validators=[validar_telefono],null=False,editable=True,verbose_name='Numero de Contacto')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     usuario = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -212,10 +212,10 @@ class Proveedor(models.Model):
         return str(f"{self.nombre}{' ' + self.direccion if self.direccion else ''} {self.nombre}")
     
 class Descuento(models.Model):
-    nombre = models.CharField(max_length=40, unique=True, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre Descuento')
-    descripcion = models.CharField(max_length=30, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
+    nombre = models.CharField(max_length=20, unique=True, validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Nombre Descuento')
+    descripcion = models.TextField(max_length=50, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     valor = models.DecimalField(max_digits=5, decimal_places=2,default=00.00, null=False, editable=True, verbose_name='Valor del Descuento')
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -244,10 +244,10 @@ class Descuento(models.Model):
         #{self.nombre} - 
 
 class Impuesto(models.Model):
-    nombre = models.CharField(max_length=40, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre Impuesto')
-    descripcion = models.CharField(max_length=30, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
+    nombre = models.CharField(max_length=15, validators=[validar_nombre_titular],null=False,editable=True,verbose_name='Nombre Impuesto')
+    descripcion = models.TextField(max_length=50, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     valor = models.DecimalField(max_digits=5, decimal_places=2,default=00.00, null=False, editable=True, verbose_name='Valor del Impuesto')
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -281,8 +281,8 @@ def impuesto_previo(sender, instance, **kwargs):
         instance.fecha_creacion = timezone.now()
     
 class Producto(models.Model):
-    nombre = models.CharField(max_length=50, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre')
-    descripcion = models.CharField(max_length=40, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
+    nombre = models.CharField(max_length=20, validators=[validar_nombre],null=False,editable=True,verbose_name='Nombre')
+    descripcion = models.TextField(max_length=50, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     precio_venta = models.DecimalField(max_digits=10, decimal_places=2,validators=[validar_precio],null=False,editable=True,verbose_name='Precio Venta')
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE,default=1, verbose_name='Categoria')
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE,default=1, verbose_name='Proveedor')
@@ -290,7 +290,7 @@ class Producto(models.Model):
     descuento = models.ForeignKey(Descuento, on_delete=models.CASCADE,default=1, verbose_name='Descuento')    
     fecha_vencimiento = models.DateField(validators=[validar_fecha_vencimiento])
     status = models.CharField(max_length=2, choices=(('1', 'Activo'), ('2', 'Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -319,10 +319,10 @@ class Producto(models.Model):
 class Inventario(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.DecimalField(max_digits=10, decimal_places=0,validators=[validar_Cantidad],null=True, editable=True, default=0, verbose_name='Cantidad') 
-    stock_maximo = models.DecimalField(max_digits=10, decimal_places=2, validators=[validar_nivel_maximo_stock],null=False,editable=True,verbose_name='Stock Maximo')
-    stock_minimo = models.DecimalField(max_digits=10, decimal_places=2, validators=[validar_nivel_minimo_stock],null=False,editable=True,verbose_name='Stock Minimo')
+    stock_maximo = models.DecimalField(max_digits=10, decimal_places=2, validators=[validar_nivel_maximo_stock],null=False,editable=True,verbose_name='Stock Máximo')
+    stock_minimo = models.DecimalField(max_digits=10, decimal_places=2, validators=[validar_nivel_minimo_stock],null=False,editable=True,verbose_name='Stock Mínimo')
     status = models.CharField(max_length=2, choices=(('1', 'Activo'), ('2', 'Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False,verbose_name='Fecha de Creación')
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -350,14 +350,14 @@ class Inventario(models.Model):
     
 class Sucursal(models.Model):
     #inventario = models.ForeignKey(Inventario, on_delete=models.CASCADE)
-    nombre = models.CharField(max_length=65, validators=[validar_nombre], editable=True, verbose_name="Nombre Sucursal")
-    ciudad = models.CharField(max_length=65, validators=[validar_nombre], editable=True, verbose_name="Ciudad de la sucursal")
-    direccion = models.CharField(max_length=255, validators=[validar_direccion], editable=True, verbose_name="Direccion de la sucursal")
-    telefono = models.CharField(max_length=8, validators=[validar_telefono], editable=True, verbose_name="Telefono de la sucursal")
+    nombre = models.CharField(max_length=20, validators=[validar_nombre], editable=True, verbose_name="Nombre Sucursal")
+    ciudad = models.CharField(max_length=15, validators=[validar_nombre], editable=True, verbose_name="Ciudad de la sucursal")
+    direccion = models.CharField(max_length=255, validators=[validar_direccion], editable=True, verbose_name="Dirección de la sucursal")
+    telefono = models.CharField(max_length=8, validators=[validar_telefono], editable=True, verbose_name="Teléfono de la sucursal")
     rtn = models.CharField(max_length=14, validators=[validar_rtn], editable=True, verbose_name="RTN de la sucursal")
     inventarios = models.ManyToManyField(Inventario, related_name="sucursales", verbose_name="Inventarios")
     status = models.CharField(max_length=2, choices=(('1','Activo'), ('2','Inactivo')), default='1', verbose_name="Estado")
-    fecha_creacion = models.DateTimeField(auto_now=True, editable=False, verbose_name="Fecha de Creacion")
+    fecha_creacion = models.DateTimeField(auto_now=True, editable=False, verbose_name="Fecha de Creación")
     history = HistoricalRecords()
     usuario = models.ForeignKey(
         get_user_model(),
@@ -386,17 +386,17 @@ class Sucursal(models.Model):
 class Empleados(models.Model):
     tipo_documento = models.ForeignKey(TipoDocumento, on_delete=models.CASCADE, default=1)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE,verbose_name="Usuario", null=True, blank=True, related_name='empleado')
-    nombre = models.CharField(max_length=65, null=False, validators=[validar_nombre], verbose_name='Nombre')
-    apellido = models.CharField(max_length=65, null=False, validators=[validar_nombre], verbose_name='Apellido')
+    nombre = models.CharField(max_length=20, null=False, validators=[validar_nombre], verbose_name='Nombre')
+    apellido = models.CharField(max_length=20, null=False, validators=[validar_nombre], verbose_name='Apellido')
     documento = models.CharField(unique=True, max_length=15, null=False, verbose_name='Documento')
     fecha_nacimiento = models.DateField(validators=[validar_fecha_nacimiento], null=False, verbose_name='Fecha de nacimiento')
-    telefono = models.CharField(max_length=10, null=False, validators=[validar_telefono], verbose_name='Telefono')
+    telefono = models.CharField(max_length=8, null=False, validators=[validar_telefono], verbose_name='Teléfono')
     correo = models.CharField(max_length=50, null=False, validators=[validar_correo], verbose_name='Correo')
     direccion = models.CharField(max_length=80, null=False, validators=[validar_direccion], verbose_name="Dirección")
     status = models.BooleanField(default=True, verbose_name="Estado")
     cargo = models.ForeignKey(TipoCargo, on_delete=models.CASCADE, verbose_name='Cargo')
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, default=1, verbose_name='Sucursal')
-    fecha_creacion = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Fecha de Creación')
     history = HistoricalRecords()
 
     class Meta:
@@ -416,7 +416,7 @@ class DetalleCompra(models.Model):
     impuesto = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[validar_valor_impuesto],verbose_name='Impuesto')
     sub_total = models.DecimalField(max_digits=10, default=0, decimal_places=2, null=False, editable=True,verbose_name='Sub Total')
     total = models.DecimalField(max_digits=10, default=0, decimal_places=2, validators=[validar_Total_Cotizacion],verbose_name='Total')
-    fecha_creacion = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Fecha de Creacion')
+    fecha_creacion = models.DateTimeField(auto_now_add=True, editable=False, verbose_name='Fecha de Creación')
     usuario = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -505,7 +505,7 @@ def campos_calculados(sender, instance, **kwargs):
 class ParametroSar(models.Model):
     numero_inicio= models.CharField(max_length=3,editable=True,null=False,help_text="De valor puede ser 000 o el valor que se le fue asignado por el SAR",verbose_name='Punto de Establecimiento ')
     numero_fin= models.CharField(max_length=2,editable=True,null=False,help_text="De valor puede ser 01 o el valor que se le fue asignado por el SAR",verbose_name='Tipo de Documento')
-    fecha_creacion = models.DateTimeField(auto_now=True,editable=False,verbose_name='Fecha Creacion')
+    fecha_creacion = models.DateTimeField(auto_now=True,editable=False,verbose_name='Fecha Creación')
     usuario = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -530,7 +530,7 @@ class ParametroSar(models.Model):
 class FacturaParametro(models.Model):
     sucursal = models.ForeignKey(Sucursal,on_delete=models.CASCADE)
     parametros = models.ForeignKey(ParametroSar,on_delete=models.CASCADE)
-    fecha_emision = models.DateTimeField(verbose_name='Fecha Emision', default=timezone.now, editable=False)
+    fecha_emision = models.DateTimeField(verbose_name='Fecha Emisión', default=timezone.now, editable=False)
     fecha_limite = models.DateField(verbose_name='Fecha Límite',validators=[validar_fecha_no_pasado],null=False,editable=True)
     cai = models.CharField(max_length=32,unique=True, validators=[validar_cai],null=False,editable=True,verbose_name='Cai',help_text='Formato: XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX')
     
@@ -559,7 +559,7 @@ class FacturaParametro(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Sucursal: {self.sucursal.nombre} - Parametros de Factura: {self.id}"     
+        return f"Sucursal: {self.sucursal.nombre} - Parámetros de Factura: {self.id}"     
     
     def clean(self):
         super().clean()
@@ -718,7 +718,7 @@ class Factura(models.Model):
     
     numero_factura = models.CharField(max_length=8,editable=False,verbose_name='Consecutivo') 
     cliente = models.ForeignKey(Clientes,on_delete=models.CASCADE,verbose_name='Cliente',  help_text= 'Consumidor Final')
-    tipo_pago = models.ForeignKey(MetodosPago,on_delete=models.CASCADE,verbose_name='Metodo de Pago')
+    tipo_pago = models.ForeignKey(MetodosPago,on_delete=models.CASCADE,verbose_name='Método de Pago')
     tarjeta= models.CharField(max_length=16,null=True,blank=True, validators=[validar_numero_tarjeta],verbose_name='Tarjeta')
     efectivo= models.CharField(max_length=40,null=True, blank=True,verbose_name='Efectivo')
     hora = models.DateTimeField(default=timezone.now, editable=False)
@@ -754,14 +754,14 @@ class Factura(models.Model):
         #ordering = ['-fecha_creacion', 'parametros__sucursal__nombre', 'numero_factura']
 
 class Rutas(models.Model):
-    ruta = models.CharField(max_length=50, validators=[validar_descripcion])
+    ruta = models.CharField(max_length=50, validators=[validar_descripcion], verbose_name="Nombre Ruta")
+    descripcion = models.TextField(max_length=100, blank=True, null=True, validators=[validar_descripcion], verbose_name="Descripción")
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Empleado")
+    
     def save(self, *args, **kwargs):
-
-        if not self.usuario:
-            # Si el campo usuario no tiene valor, establecemos el usuario en línea actual
-            user_model = get_user_model()
-            self.usuario = user_model.objects.get(pk=1)  # Puedes ajustar esto según tu lógica para obtener el usuario en línea
+        if not self.pk and not self.usuario:
+            self.usuario = get_user(kwargs.get('request'))
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return str(self.ruta)
@@ -771,10 +771,10 @@ class Rutas(models.Model):
         verbose_name_plural = 'Rutas'
     
 class Transporte(models.Model):
-    ruta = models.ForeignKey(Rutas, on_delete=models.CASCADE,default=1)
-    nombre_carro = models.CharField(max_length=50, validators=[validar_nombre])
-    codigo = models.CharField(max_length=50, validators=[validar_placa_honduras])
-    chofer = models.ForeignKey(Empleados, on_delete=models.CASCADE,default=1)
+    ruta = models.ForeignKey(Rutas, on_delete=models.CASCADE,default=1, verbose_name="Ruta de Entrega")
+    nombre_carro = models.CharField(max_length=50, validators=[validar_nombre], verbose_name="Nombre del Vehiculo")
+    codigo = models.CharField(max_length=50, validators=[validar_placa_honduras], verbose_name="Codigo")
+    chofer = models.ForeignKey(Empleados, on_delete=models.CASCADE,default=1,verbose_name="Conductor")
 
     def __str__(self):
         try:
@@ -786,10 +786,10 @@ class Transporte(models.Model):
         verbose_name = 'Transporte'
         
 class Entrega(models.Model):
-    carro = models.ForeignKey(Transporte, on_delete=models.CASCADE, default=1)
-    fecha_entrega = models.DateField(null=True, blank=True, validators=[validar_fecha_no_pasado])
-    hora_entrega = models.TimeField(null=True, blank=True)
-    direccion_entrega = models.CharField(max_length=255, null=True, blank=True, validators=[validar_direccion])
+    carro = models.ForeignKey(Transporte, on_delete=models.CASCADE, default=1, verbose_name="Vehiculo de Entrega")
+    fecha_entrega = models.DateField(null=True, blank=True, validators=[validar_fecha_no_pasado], verbose_name="Fecha de Entrega")
+    hora_entrega = models.TimeField(null=True, blank=True , verbose_name="Hora Estimada de Entrega")
+    direccion_entrega = models.CharField(max_length=255, null=True, blank=True, validators=[validar_direccion], verbose_name="Dirección de Entrega")
     
     def __str__(self):
         return str(self.direccion_entrega)
@@ -799,18 +799,16 @@ class Entrega(models.Model):
         verbose_name_plural = 'Entregas'
 
 class Devoluciones(models.Model):
-    id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE,default=1)
-    cantidad = models.IntegerField(validators=[validar_Cantidad])
-    descripcion = models.CharField(max_length=255,validators=[validar_descripcion])
-    fecha_devolucion = models.DateField(validators=[validar_date_time])
+    id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE,default=1, verbose_name="Producto")
+    cantidad = models.IntegerField(validators=[validar_Cantidad], verbose_name="Cantidad")
+    descripcion = models.TextField(max_length=50,validators=[validar_descripcion], verbose_name="Descripción")
+    fecha_devolucion = models.DateField(validators=[validar_fecha_no_futuro])
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Empleado")
     
     def save(self, *args, **kwargs):
-
-        if not self.usuario:
-            # Si el campo usuario no tiene valor, establecemos el usuario en línea actual
-            user_model = get_user_model()
-            self.usuario = user_model.objects.get(pk=1)  # Puedes ajustar esto según tu lógica para obtener el usuario en línea
+        if not self.pk and not self.usuario:
+            self.usuario = get_user(kwargs.get('request'))
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = 'Devolucion'
@@ -834,39 +832,112 @@ def aumentar_stock(sender, instance, created, **kwargs):
         return self.descripcion
 
 class Cotizacion(models.Model):
-    id_cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
-    id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    fecha_cotizacion = models.DateField(auto_now = True, validators=[validar_fecha_actualizacion])
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Empleado")
-    def save(self, *args, **kwargs):
-
-        if not self.usuario:
-            # Si el campo usuario no tiene valor, establecemos el usuario en línea actual
-            user_model = get_user_model()
-            self.usuario = user_model.objects.get(pk=1)  # Puedes ajustar esto según tu lógica para obtener el usuario en línea
+    id_cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE, verbose_name="Cliente", related_name="cotizaciones")
+    productos = models.ManyToManyField(Inventario, through='DetalleCotizacion')
+    parametros = models.ForeignKey(FacturaParametro,on_delete=models.CASCADE,default=1)
+    sub_total = models.DecimalField(max_digits=10,decimal_places=2,default=0,editable=False)
+    descuento = models.DecimalField(max_digits=10,decimal_places=2,default=0,editable=False)
+    impuesto = models.DecimalField(max_digits=10,decimal_places=2,default=0, validators=[validar_valor_impuesto],editable=False)
+    total = models.DecimalField(max_digits=10,default=0, decimal_places=2,editable=False)
+    fecha_cotizacion = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Cotización",editable=False)
+    usuario = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        verbose_name="Empleado",
+        null=True,
+        editable=False
+    )
     
+    @staticmethod
+    def parse_to_decimal(value):
+        try:
+            return Decimal(str(value))
+        except Exception as e:
+            print(f"Error al convertir a decimal: {e}")
+            return Decimal('0')
+      
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.usuario:
+            self.usuario = get_user(kwargs.get('request'))
+        super().save(*args, **kwargs)
+
     class Meta:
-        verbose_name = 'Cotizacion'
-        verbose_name_plural = 'Cotizaciones'  
+        verbose_name = 'Cotización'
+        verbose_name_plural = 'Cotizaciones'
+
+    def __str__(self):
+        return f"Cotización {self.id} - Cliente: {self.id_cliente.nombre}"
+
+class DetalleCotizacion(models.Model):
+    cotizacion = models.ForeignKey(Cotizacion, on_delete=models.CASCADE, verbose_name="Cotizacion")
+    producto = models.ForeignKey(Inventario, on_delete=models.CASCADE)
+    cantidad = models.DecimalField(max_digits=10,decimal_places=2,default=0, validators=[validar_Cantidad],null=True, blank=False, verbose_name='Cantidad')  
+    usuario = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        verbose_name="Empleado",
+        null=True,
+        editable=False
+    )
+    
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.usuario:
+            self.usuario = get_user(kwargs.get('request'))
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def parse_to_decimal(value):
+        try:
+            return Decimal(str(value))
+        except Exception as e:
+            print(f"Error al convertir a decimal: {e}")
+            return Decimal('0')
     
     def __str__(self):
-        return str(self.id_cliente)  # Devuelve una representación de cadena del objeto Clientes
+        return '{}'.format(self.cotizacion)
+    
+    class Meta:
+        verbose_name = 'Detalle de Cotización'
+        verbose_name_plural = 'Detalles de Cotizaciones'
+
+@receiver(post_save, sender = DetalleCotizacion)
+def campos_calculados(sender, instance, **kwargs):
+    detallecotizacion = instance.cotizacion
+    items = DetalleCotizacion.objects.filter(cotizacion = detallecotizacion)
+    sub_total = 0
+    impuesto = 0
+    descuento = 0
+    
+    for i in items:
+        sub_total += abs(i.cantidad * i.producto.producto.precio_venta)
+
+    for i in items:
+        impuesto += abs((sub_total) * (i.producto.producto.impuesto.valor))
+
+    for i in items:
+        descuento += abs((sub_total) * (i.producto.producto.descuento.valor))
+    
+    instance.cotizacion.sub_total = sub_total
+    instance.cotizacion.impuesto = impuesto
+    instance.cotizacion.descuento = descuento
+    instance.cotizacion.total = abs(((instance.cotizacion.sub_total) - (instance.cotizacion.descuento)) + (instance.cotizacion.impuesto))
+    instance.cotizacion.save()
 
 class Pedido(models.Model):
-    id_clientes = models.ForeignKey(Clientes, on_delete=models.CASCADE)
-    id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    id_clientes = models.ForeignKey(Clientes, on_delete=models.CASCADE, verbose_name="Cliente")
+    id_producto = models.ForeignKey(Producto, on_delete=models.CASCADE, verbose_name="Producto")
     fecha_pedido = models.DateTimeField(auto_now_add=True)
     total_pedido = models.FloatField(validators=[validar_total_pedido], null=True, blank=True)
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Empleado")
-    def save(self, *args, **kwargs):
-
-        if not self.usuario:
-            # Si el campo usuario no tiene valor, establecemos el usuario en línea actual
-            user_model = get_user_model()
-            self.usuario = user_model.objects.get(pk=1)  # Puedes ajustar esto según tu lógica para obtener el usuario en línea
     
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.usuario:
+            self.usuario = get_user(kwargs.get('request'))
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return str(self.fecha_pedido)
+    
     class Meta:
         verbose_name = 'Pedido'
         verbose_name_plural = 'Pedidos'
