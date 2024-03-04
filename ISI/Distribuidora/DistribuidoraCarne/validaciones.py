@@ -1,6 +1,5 @@
-import datetime
 import re
-from datetime import date
+from datetime import *
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .models import *
@@ -325,7 +324,7 @@ def validar_numero_tarjeta(numero_tarjeta):
     
     return numero_tarjeta_sin_formato
 
-def validar_fecha_vencimiento(fecha_vencimiento):
+def validar_fecha_vencimiento(self, fecha_vencimiento):
     # Obtener la fecha actual
     fecha_actual = timezone.now().date()
 
@@ -364,7 +363,7 @@ def validar_cvv(cvv):
 def validar_nombre_titular(nombre):
     letras = sum(c.isalpha() for c in nombre)
     if letras < 1:
-        raise ValidationError('El nombre debe contener al menos 1 letras.')
+        raise ValidationError('El nombre debe contener al menos 1 letra.')
     if re.search(r'\d', nombre):
         raise ValidationError('El nombre no puede contener números.')
 

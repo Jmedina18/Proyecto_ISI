@@ -53,8 +53,7 @@ class MetodosPago(models.Model):
         return str(f"{self.nombre}{' ' + self.descripcion if self.descripcion else ''} {self.nombre}")
     
     class Meta:
-        verbose_name_plural = "Métodos de Pago"  # Puedes personalizar el nombre plural en el admin
-        #ordering = ['nombre']  # Puedes especificar el orden predeterminado de los objetos en las consultas
+        verbose_name_plural = "Métodos de Pago"  
 
 class TipoDocumento(models.Model):
     nombre = models.CharField(max_length=15, validators=[validar_nombre_titular], default='Identidad',verbose_name='Nombre del documento')
@@ -941,3 +940,4 @@ class Pedido(models.Model):
     class Meta:
         verbose_name = 'Pedido'
         verbose_name_plural = 'Pedidos'
+
